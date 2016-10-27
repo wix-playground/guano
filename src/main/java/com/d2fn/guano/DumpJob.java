@@ -1,15 +1,18 @@
 package com.d2fn.guano;
 
-import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 /**
  * DumpJob
+ *
  * @author Dietrich Featherston
  */
 public class DumpJob implements Job, Watcher {
@@ -41,7 +44,7 @@ public class DumpJob implements Job, Watcher {
 
     private void go(ZooKeeper zk) {
         try {
-            while(!zk.getState().isConnected()) {
+            while (!zk.getState().isConnected()) {
                 System.out.println("connecting to " + zkServer + " with chroot " + znode);
                 Thread.sleep(1000L);
             }
@@ -59,7 +62,7 @@ public class DumpJob implements Job, Watcher {
         System.out.println("outputPath: " + outputPath);
         String currznode = znodePath.length() == 0 ? "/" : znodePath;
         List<String> children = zk.getChildren(currznode, false);
-        if(!children.isEmpty()) {
+        if (!children.isEmpty()) {
 
             // ensure parent dir is created
             File f = new File(outputPath);
@@ -68,12 +71,11 @@ public class DumpJob implements Job, Watcher {
             // this znode is a dir, so ensure the directory is created and build a __znode value in its dir
             writeZnode(zk, outputPath + "/_znode", currznode);
 
-            for(String c : children) {
+            for (String c : children) {
                 System.out.println("c: " + c);
                 dumpChild(zk, outputPath + "/" + c, znodePath + "/", c);
             }
-        }
-        else {
+        } else {
             // this znode has no contents to write a plan file with the znode contents here
             writeZnode(zk, outputPath, currznode);
         }
@@ -82,9 +84,9 @@ public class DumpJob implements Job, Watcher {
     private void writeZnode(ZooKeeper zk, String outFile, String znode) throws Exception {
         Stat stat = new Stat();
         byte[] data = zk.getData(znode, false, stat);
-        if(data != null && data.length > 0 && stat.getEphemeralOwner() == 0) {
+        if (data != null && data.length > 0 && stat.getEphemeralOwner() == 0) {
             String str = new String(data);
-            if(!str.equals("null")) {
+            if (!str.equals("null")) {
                 FileOutputStream out = new FileOutputStream(outFile);
                 out.write(data);
                 out.flush();
@@ -95,6 +97,7 @@ public class DumpJob implements Job, Watcher {
 
     @Override
     public void process(WatchedEvent watchedEvent) {
-        ;;
+        ;
+        ;
     }
 }
